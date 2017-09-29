@@ -1,14 +1,20 @@
 # Modeling Black Death:
-
+##### Adam Novotny and Apurva Raman
 We intend to model the epidemic known as Black Death. Using datasets from the Old World Trade Routes (OWTRAD) project, we will recreate a network of historically correct cities and trade routes, and then analyze the spread of disease through this network. We are interested analyzing transmission temporally, and seeing how initial parameters affect the results. We are interested in this project because of its specificity in trying to model a very specific scenario, and we want to see how generalizing the model would affect the conclusions (Is the complexity of 'real data' necessary, or only there to tell a good story?).
 
 
 Bibliography:
 Gómez, J. M. and Verdú, M. Network theory may explain the vulnerability of medieval human settlements to the Black Death pandemic. Sci. Rep. 7, 43467; doi: 10.1038/srep43467 (2017).
 
+Gómez et. al. use the Old World Trade Routes Dataset to construct a network model of Black Death transmission in human settlements at the time to determine what settlements were affected most by the pandemic. They use simulation and study the properties of the network from the dataset and use the results to observe infection patterns. They found that reinfection of central cities was instrumental in perpetuating the destruction of the plague. The summary data for each city is included in the supplementary information.
+
 Pastor-Satorras, R., & Vespignani, A. (2002). Immunization of complex networks. Physical Review E, 65(3), 036104.
 
+Pastor-Satorras and Vespignani modeled disease spread over multiple networks. They show that a uniform random immunization strategy is not very efficient, and propose and analyze improved strategies for immunization. They found that scale-free networks are highly susceptible to epidemics, but discovered extremely effective strategies of immunization for it. They suggest that their model is relevant to the spreading of viruses over the internet, and propose a way to extend it to model STD transmission.
+
 Keeling, M. J., & Eames, K. T. . (2005). Networks and epidemic models. Journal of the Royal Society Interface, 2(4), 295–307. 10.1098/rsif.2005.0051
+
+The authors provide an overview of the analogies between network attributes and epidemic characteristics. Rather than conducting a specific experiment, they explain the value of various models in simulating disease transmission. For example, they recommend scale-free networks constructed as described by Barabasi & Albert for creating models that account for super-spreaders. 
 
 ## Replicate experiment:
 We plan on recreating the model presented by Gómez et. al. in "Network theory may explain the vulnerability of medieval human settlements to the Black Death pandemic." They created a realistic network of the Western world, and drew conclusions between city mortality and their network attributes. They used historical data to confirm their model is reasonably accurate simulation of the epidemic, and then discussed the specific characteristics of cities vs their location in the network.
