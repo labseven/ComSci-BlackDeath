@@ -18,14 +18,14 @@ def import_owtrad():
     print("Importing OWTRAD files from", OWTRAD_DIR)
 
     nodes = pd.DataFrame()
-    for filename in [OWTRAD_DIR + filename for filename in os.listdir(OWTRAD_DIR) if '-nodes' in filename]:
+    for filename in [OWTRAD_DIR + filename for filename in os.listdir(OWTRAD_DIR) if ('-nodes' in filename and 'pilgrimage' not in filename)]:
         new_csv = pd.read_csv(filename.strip(), header=0)
         nodes = pd.concat([nodes, new_csv], ignore_index=True)
 
     print("Imported", len([OWTRAD_DIR + filename for filename in os.listdir(OWTRAD_DIR) if '-nodes' in filename]), 'node files')
 
     edges = pd.DataFrame()
-    for filename in [OWTRAD_DIR + filename for filename in os.listdir(OWTRAD_DIR) if '-edges' in filename]:
+    for filename in [OWTRAD_DIR + filename for filename in os.listdir(OWTRAD_DIR) if ('-edges' in filename and 'pilgrimage' not in filename)]:
         new_csv = pd.read_csv(filename.strip(), header=0)
         edges = pd.concat([edges, new_csv], ignore_index=True)
 
