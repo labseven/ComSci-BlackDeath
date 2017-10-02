@@ -35,8 +35,4 @@ def import_owtrad():
     # print()
     # print(edges.info())
 
-    # print(edges.iloc[0])
-    # print(edges.dtypes)
-    # print(edges.columns.values.tolist())
-
     return nodes, edges
