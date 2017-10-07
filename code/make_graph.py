@@ -111,6 +111,7 @@ class CityInfectionModel:
         self.history[self.cityI(city), self.S, time_step] = self.history[self.cityI(city), self.S, time_step - 1]
 
     def SIR_step_one_city(self, city, time_step):
+        """ Note: make it only update time_step """
         cur_susceptible, cur_infected, cur_dead = self.history[self.cityI(city), :, time_step]
         print(cur_susceptible, cur_infected, cur_dead)
 
@@ -133,6 +134,9 @@ class CityInfectionModel:
         for neighbor in G[city]:
             if toss(p_transmission):
                 self.transmit_intercity(city, neighbor)
+
+    def run_model(self):
+        """ loop through steps and update_city, SIR_step, intercity_step n times """
 
 
 
