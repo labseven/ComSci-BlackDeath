@@ -9,6 +9,10 @@ from thinkstats2 import Cdf, Pmf
 
 from import_owtrad import import_owtrad
 
+max_steps = 100000
+
+
+
 
 # Import the OWTRAD dataset
 nodes, edges = import_owtrad()
@@ -18,14 +22,21 @@ nodes, edges = import_owtrad()
 edges_to_use = edges.loc[(edges.USES == 'trd') | (edges.USES == 'plg')]
 edges_list = zip(edges_to_use['NODE1'], edges_to_use['NODE2'])
 
+# Make nx graph
+G = nx.Graph()
+G.add_edges_from(edges_list)
 
+
+print("G Len nodes:", len(G.nodes()))
+print("G Len edges:", len(G.edges()))
+
+
+
+
+
+# Build  networks
 trade_edges = edges[edges['USES'] == 'trd']
 pilgrimadge_edges = edges[edges['USES'] == 'plg']
-
-
-
-
-# build networks
 print("Trade routes:", len(trade_edges))
 print("Pilgrimadge routes:", len(pilgrimadge_edges))
 print()
@@ -37,24 +48,9 @@ network_pilgrimadge = nx.Graph()
 network_pilgrimadge.add_edges_from(zip(pilgrimadge_edges.NODEID1, pilgrimadge_edges.NODEID2))
 
 
-
 print("Trade nodes:", len(network_trade.nodes()))
 print("Pilgrimadge nodes:", len(network_pilgrimadge.nodes()))
 
-
-# Make nx graph
-G = nx.Graph()
-G.add_edges_from(edges_list)
-
-
-print("G Len nodes:", len(G.nodes()))
-print("G Len edges:", len(G.edges()))
-
-node_df = pd.DataFrame(columns=["nodes", "susceptible", "infected", "dead"])
-node_df.nodes = G.nodes()
-node_df.susceptible = [100]*len(G.nodes())
-node_df.infected = [0]*len(G.nodes())
-node_df.dead = [0]*len(G.nodes())
 
 def draw_graph(G):
     nx.draw_circular(G,
@@ -62,20 +58,49 @@ def draw_graph(G):
                      with_labels=True)
     plt.show()
 
-# Visualize graph (SLOW on large graphs)
+# (SLOW for large graphs)
 # draw_graph(G)
 
 
-# infected_timestamps maps cities to a list of the timestamps at which they get infected (cities can be infected multiple times)
-infected_timestamps = dict.fromkeys(G.nodes(), frozenset())
+# # Init DataFrame
+# node_df = pd.DataFrame(columns=["nodes", "susceptible", "infected", "dead"])
+# node_df.nodes = G.nodes()
+# node_df.susceptible = [100]*len(G.nodes())
+# node_df.infected = [0]*len(G.nodes())
+# node_df.dead = [0]*len(G.nodes())
+
+
+
 # cur_infected holds all the cities that are currently infected
 # It is seeded with the starting cities
 cur_infected = set(['Etil','Bukhara'])
+class CityInfectionModel:
+    def __init__(self, nodes, max_steps):
+        self.node_list = nodes
+
+        # Make np array to hold entire history
+        # 3D: axis0 = node; axis1=s,i,d; axis2=history
+        node_history = np.zeros((len(self.node_list), 3, max_steps))
+        # Init susceptible @ time 0 to 100
+        node_history[:, 0, 0] = 100
+
+    def make_infected(city, time_step, num_infected):
+        node_history[node_list.index(city), 0, 0] +=
+
+    def make_dead(city, num_dead):
+
+for city in cur_infected:
+    node_history[node_list.index(city), 0, 0] = 90
 
 
-def infect_city(node_df, node, infection_rate, mortality_rate):
-    node_df.set_value(node, "susceptible", 9)
-    node_df.get_value(node, 'susceptible')
+time_step = 0
+
+def sis_step(node_history, node, infection_rate, mortality_rate):
+
+    # node_df.set_value(node, "susceptible", 9)
+    # node_df.get_value(node, 'susceptible')
+
+
 
 # Init i and infected_timestamps
 i = 0
