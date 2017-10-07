@@ -73,32 +73,50 @@ def draw_graph(G):
 
 # cur_infected holds all the cities that are currently infected
 # It is seeded with the starting cities
-cur_infected = set(['Etil','Bukhara'])
+
+
 class CityInfectionModel:
+    """ Tracks intra-city SIR models, and inter-city infection transmission rates """
+    S = 0
+    I = 1
+    D = 2
+
+    infection_rate = .2
+    mortality_rate = .2
+
     def __init__(self, nodes, max_steps):
         self.node_list = nodes
+        self.cur_infected = set()
 
         # Make np array to hold entire history
         # 3D: axis0 = node; axis1=s,i,d; axis2=history
-        node_history = np.zeros((len(self.node_list), 3, max_steps))
+        self.node_history = np.zeros((len(self.node_list), 3, max_steps))
         # Init susceptible @ time 0 to 100
-        node_history[:, 0, 0] = 100
+        self.node_history[:, 0, 0] = 100
 
-    def make_infected(city, time_step, num_infected):
-        node_history[node_list.index(city), 0, 0] +=
+    def cityI(self, city):
+        return self.node_list.index(city)
 
-    def make_dead(city, num_dead):
+    def city_make_infected(self, city, time_step, num_infected):
+        # Remove population from susceptible to infected
+        self.node_history[self.cityI(city), self.S, time_step] -= num_infected
+        self.node_history[self.cityI(city), self.I, time_step] += num_infected
 
-for city in cur_infected:
-    node_history[node_list.index(city), 0, 0] = 90
+    def city_make_dead(self, city, time_step, num_dead):
+        self.node_history[self.cityI(city), self.I, time_step] -= num_dead
+        self.node_history[self.cityI(city), self.D, time_step] += num_dead
+
+    def city_SIR_step(self, city, time_step):
+        pass
 
 
+plague = CityInfectionModel(G.nodes(), max_steps)
 time_step = 0
 
-def sis_step(node_history, node, infection_rate, mortality_rate):
+# Init infection
+for city in init_infected:
+    plague.city_make_infected(city, 0, 10)
 
-    # node_df.set_value(node, "susceptible", 9)
-    # node_df.get_value(node, 'susceptible')
 
 
 
