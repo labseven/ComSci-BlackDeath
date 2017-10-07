@@ -83,40 +83,70 @@ class CityInfectionModel:
 
     infection_rate = .2
     mortality_rate = .2
+    transmission_rate = .3
 
     def __init__(self, nodes, max_steps):
-        self.node_list = nodes
+        self.node_list = list(nodes)
         self.cur_infected = set()
 
         # Make np array to hold entire history
         # 3D: axis0 = node; axis1=s,i,d; axis2=history
-        self.node_history = np.zeros((len(self.node_list), 3, max_steps))
+        self.history = np.zeros((len(self.node_list), 3, max_steps), dtype=np.int32)
         # Init susceptible @ time 0 to 100
-        self.node_history[:, 0, 0] = 100
+        self.history[:, 0, 0] = 100
 
     def cityI(self, city):
         return self.node_list.index(city)
 
     def city_make_infected(self, city, time_step, num_infected):
         # Remove population from susceptible to infected
-        self.node_history[self.cityI(city), self.S, time_step] -= num_infected
-        self.node_history[self.cityI(city), self.I, time_step] += num_infected
+        self.history[self.cityI(city), self.S, time_step] -= num_infected
+        self.history[self.cityI(city), self.I, time_step] += num_infected
 
     def city_make_dead(self, city, time_step, num_dead):
-        self.node_history[self.cityI(city), self.I, time_step] -= num_dead
-        self.node_history[self.cityI(city), self.D, time_step] += num_dead
+        self.history[self.cityI(city), self.I, time_step] -= num_dead
+        self.history[self.cityI(city), self.D, time_step] += num_dead
 
-    def city_SIR_step(self, city, time_step):
-        pass
+    def city_make_susceptible(self, city, time_step):
+        self.history[self.cityI(city), self.S, time_step] = self.history[self.cityI(city), self.S, time_step - 1]
+
+    def SIR_step_one_city(self, city, time_step):
+        cur_susceptible, cur_infected, cur_dead = self.history[self.cityI(city), :, time_step]
+        print(cur_susceptible, cur_infected, cur_dead)
+
+        num_to_infect = (cur_infected/cur_susceptible) * infection_rate
+        num_to_die = cur_infected * mortality_rate
+
+        self.city_make_susceptible(city, time_step + 1)
+        self.city_make_infected(city, time_step + 1, num_to_infect)
+        self.city_make_dead(city, time_step + 1, num_to_die)
+
+    def SIR_step(self, time_step):
+        for city in cur_infected:
+            self.SIR_step_one_city(city, time_step)
+
+    def transmit_intercity(self, node1, node2, time_step):
+        city_make_infected(neighbor, time_step, 1)
+
+    def intercity_step_one_city(self, city, time_step):
+        p_transmission = transmission_rate * self.history[self.cityI(city), self.I, time_step]
+        for neighbor in G[city]:
+            if toss(p_transmission):
+                self.transmit_intercity(city, neighbor)
+
 
 
 plague = CityInfectionModel(G.nodes(), max_steps)
 time_step = 0
+init_infected = ["Paris"]
 
 # Init infection
 for city in init_infected:
     plague.city_make_infected(city, 0, 10)
 
+print(plague.history[0,0,0])
+print(plague.history[plague.history[:,0,0] != 100])
+print(plague.history[plague.cityI("Paris")])
 
 
 
