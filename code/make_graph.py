@@ -1,4 +1,5 @@
 import networkx as nx
+import _pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,7 +10,6 @@ from thinkstats2 import Cdf, Pmf
 
 from import_owtrad import import_owtrad
 
-max_steps = 100000
 
 
 
@@ -62,152 +62,165 @@ def draw_graph(G):
 # draw_graph(G)
 
 
-# # Init DataFrame
-# node_df = pd.DataFrame(columns=["nodes", "susceptible", "infected", "dead"])
-# node_df.nodes = G.nodes()
-# node_df.susceptible = [100]*len(G.nodes())
-# node_df.infected = [0]*len(G.nodes())
-# node_df.dead = [0]*len(G.nodes())
 
-
-
-# cur_infected holds all the cities that are currently infected
-# It is seeded with the starting cities
-
+def toss(p):
+    return np.random.ranf() < p
 
 class CityInfectionModel:
     """ Tracks intra-city SIR models, and inter-city infection transmission rates """
     S = 0
     I = 1
     D = 2
+    Itimes = 3
 
-    infection_rate = .2
-    mortality_rate = .2
-    transmission_rate = .3
 
-    def __init__(self, nodes, max_steps):
+    def __init__(self, nodes, max_steps, init_infected=None, model_rates=None):
         self.node_list = list(nodes)
         self.cur_infected = set()
 
+        if model_rates is None:
+            self.infection_rate    = .2
+            self.mortality_rate    = .2
+            self.transmission_rate = .1
+        else:
+            self.infection_rate, self.mortality_rate, self.transmission_rate = model_rates
+
+
         # Make np array to hold entire history
-        # 3D: axis0 = node; axis1=s,i,d; axis2=history
-        self.history = np.zeros((len(self.node_list), 3, max_steps), dtype=np.int32)
-        # Init susceptible @ time 0 to 100
+        # 3D: axis0 = city; axis1=s,i,d (susceptible, infected, dead); axis2=time steps
+        self.history = np.zeros((len(self.node_list), 4, max_steps), dtype=np.uint8)
+        # Init susceptible population @ time 0 to 100
         self.history[:, 0, 0] = 100
 
+        init_infected = [] if init_infected is None else init_infected
+        for city in init_infected:
+            self.city_make_infected(city, 0, 10)
+            self.cur_infected.add(city)
+
     def cityI(self, city):
+        """ Returns index of city in array by name """
         return self.node_list.index(city)
 
-    def city_make_infected(self, city, time_step, num_infected):
+    def city_make_infected(self, city, time_step, num_infect):
+        """ Move num_infected people from susceptible to infected """
+        if self.history[self.cityI(city), self.S, time_step] <= num_infect:
+            num_infect = self.history[self.cityI(city), self.S, time_step]
+
         # Remove population from susceptible to infected
-        self.history[self.cityI(city), self.S, time_step] -= num_infected
-        self.history[self.cityI(city), self.I, time_step] += num_infected
+        self.history[self.cityI(city), self.S, time_step] -= num_infect
+        self.history[self.cityI(city), self.I, time_step] += num_infect
 
-    def city_make_dead(self, city, time_step, num_dead):
-        self.history[self.cityI(city), self.I, time_step] -= num_dead
-        self.history[self.cityI(city), self.D, time_step] += num_dead
+    def city_make_dead(self, city, time_step, num_die):
+        """ Move num_dead people from infected to dead """
+        if self.history[self.cityI(city), self.I, time_step] <= num_die:
+            num_die = self.history[self.cityI(city), self.I, time_step]
 
-    def city_make_susceptible(self, city, time_step):
-        self.history[self.cityI(city), self.S, time_step] = self.history[self.cityI(city), self.S, time_step - 1]
+        self.history[self.cityI(city), self.I, time_step] -= num_die
+        self.history[self.cityI(city), self.D, time_step] += num_die
+
 
     def SIR_step_one_city(self, city, time_step):
-        """ Note: make it only update time_step """
-        cur_susceptible, cur_infected, cur_dead = self.history[self.cityI(city), :, time_step]
-        print(cur_susceptible, cur_infected, cur_dead)
+        """ Updates a city's SIR model at time_step
+        Note: you must first copy data from the previous time step into time_step """
+        num_susceptible, num_infected, num_dead, _ = self.history[self.cityI(city), :, time_step]
 
-        num_to_infect = (cur_infected/cur_susceptible) * infection_rate
-        num_to_die = cur_infected * mortality_rate
+        if num_susceptible > 0:
+            num_to_infect = int(num_infected * self.infection_rate)
+        else:
+            num_to_infect = 0
 
-        self.city_make_susceptible(city, time_step + 1)
-        self.city_make_infected(city, time_step + 1, num_to_infect)
-        self.city_make_dead(city, time_step + 1, num_to_die)
+        num_to_die = int(num_infected * self.mortality_rate)
 
-    def SIR_step(self, time_step):
-        for city in cur_infected:
+        # print("i: {}, d: {}".format(num_to_infect, num_to_die))
+
+        self.city_make_infected(city, time_step, num_to_infect)
+        self.city_make_dead(city, time_step, num_to_die)
+
+    def SIR_one_step(self, time_step):
+        """ Run SIR on all infected cities """
+        for city in frozenset(self.cur_infected):
             self.SIR_step_one_city(city, time_step)
 
-    def transmit_intercity(self, node1, node2, time_step):
-        city_make_infected(neighbor, time_step, 1)
-
     def intercity_step_one_city(self, city, time_step):
-        p_transmission = transmission_rate * self.history[self.cityI(city), self.I, time_step]
+        """ Transmits disease between cities """
+        # Probability of transmission is the transmission_rate times number of infected in origin city
+        # Should this be the infected ratio of origin city?
+        p_transmission = self.transmission_rate * self.history[self.cityI(city), self.I, time_step]
         for neighbor in G[city]:
             if toss(p_transmission):
-                self.transmit_intercity(city, neighbor)
+                # print("transmiting from {} to {}".format(city, neighbor))
+                # What a "transmission event" actually does
+                num_to_transmit = 1
 
-    def run_model(self):
-        """ loop through steps and update_city, SIR_step, intercity_step n times """
+                self.city_make_infected(neighbor, time_step, num_to_transmit)
+                self.history[self.cityI(city), self.Itimes, time_step] += 1
+                self.cur_infected.add(neighbor) # Add city to cur_infected so that it gets SIR run on it
+
+    def intercity_one_step(self, time_step):
+        """ Runs intercity_step_one_city on all infected cities """
+
+        for city in frozenset(self.cur_infected):
+            self.intercity_step_one_city(city, time_step)
+
+    def copy_timestep(self, time_step):
+        """ Copies S,I,D from time_step-1 into time_step """
+        self.history[:, :self.Itimes, time_step] = self.history[:, :self.Itimes, time_step - 1]
+
+    def model_one_step(self, time_step):
+        """ Runs a complete step """
+        self.copy_timestep(time_step)
+        self.SIR_one_step(time_step)
+        self.intercity_one_step(time_step)
+
+    def run_model(self, n, init_time_step = 1):
+        """ loop through steps and update_city, SIR_step, intercity_step n times starting at init_time_step"""
+
+        for time_step in range(init_time_step, init_time_step + n):
+            if time_step%10==0: print("step {}".format(time_step))
+            self.model_one_step(time_step)
+
+    def save_to_disk(self, filename):
+        _pickle.dump(self.history, open(filename, "wb"))
 
 
 
-plague = CityInfectionModel(G.nodes(), max_steps)
-time_step = 0
 init_infected = ["Paris"]
+plague = CityInfectionModel(G.nodes(), 1500, init_infected=init_infected)
+time_step = 0
 
-# Init infection
-for city in init_infected:
-    plague.city_make_infected(city, 0, 10)
+# Print infection
+# print(plague.history[0,0,0])
+# print(plague.history[plague.history[:,0,0] != 100])
+# print(plague.history[plague.cityI("Paris")])
 
-print(plague.history[0,0,0])
-print(plague.history[plague.history[:,0,0] != 100])
-print(plague.history[plague.cityI("Paris")])
+print()
 
+plague.run_model(1500)
 
+plague.save_to_disk("test_run.pkl")
 
-# Init i and infected_timestamps
-i = 0
-for city in cur_infected:
-    infected_timestamps[city] = infected_timestamps[city].union(set([i]))
-    infect_city(node_df, city, 3, 0)
-
-
-def toss(p):
-    return np.random.ranf() < p
+# print(plague.history[plague.history[:,0,0] != 100])
+# print(plague.history[:,:,50])
 
 
-# At each step, neighbors of cur_infected have a p chance of being infected
-def step_infect(G, cur_infected, p):
-    newly_infected = set()
-    for infected_city in cur_infected:
-        neighbors = G[infected_city]
-        for city in neighbors:
-            if toss(p):
-                newly_infected.add(city)
-    return newly_infected
-
-# Tracking the number of times the disease spreads
-infections_count = 0
-# Probability of disease transmission
-p = .1
 
 
-# Run the simulation
-while (infections_count < 6 * len(G.nodes())):
-    newly_infected = step_infect(G, cur_infected, p)
-
-    for city in newly_infected:
-        cur_infected.add(city)
-    infections_count += len(newly_infected)
-
-    for city in newly_infected:
-        infected_timestamps[city] = infected_timestamps[city].union(set([i]))
-
-    i+=1
 
 
+"""
 # Analytics
-print(len(cur_infected))
+# print(len(cur_infected))
 # print([(city, infected_times[city]) for city in infected_times if infected_times[city]])
 
 
 # Sum the number of times each city has been infected
-infections_per_city = dict()
-for city in infected_timestamps:
-    infections_per_city[city] = len(infected_timestamps[city])
+# infections_per_city = dict()
+# for city in infected_timestamps:
+#     infections_per_city[city] = len(infected_timestamps[city])
 
 
 # infection_cdf = Cdf(infection_count.values())
-# thinkplot.Cdf(infection_cdf)
+# t.Cdf(infection_cdf)
 # thinkplot.show()
 
 
@@ -255,3 +268,4 @@ thinkplot.Cdf(degree_cdf)
 # print(nodes.info())
 # print()
 # print(edges.info())
+"""
