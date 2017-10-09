@@ -3,6 +3,7 @@ import _pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 import thinkplot
 import thinkstats2
@@ -26,30 +27,64 @@ edges_list = zip(edges_to_use['NODE1'], edges_to_use['NODE2'])
 G = nx.Graph()
 G.add_edges_from(edges_list)
 
-
-print("G Len nodes:", len(G.nodes()))
-print("G Len edges:", len(G.edges()))
-
+print('Num nodes: {}'.format(len(G)))
+# print("G Len nodes:", len(G.nodes()))
+# print("G Len edges:", len(G.edges()))
+# print("G transitivity:", nx.transitivity(G))
+# print("G Degree Centrality:", np.mean(list(nx.degree_centrality(G).values())))
+# print("G Closeness Centrality:", np.mean(list(nx.closeness_centrality(G).values())))
+# print("G Clustering:", nx.average_clustering(G))
 
 
 
 
 # Build  networks
-trade_edges = edges[edges['USES'] == 'trd']
-pilgrimadge_edges = edges[edges['USES'] == 'plg']
-print("Trade routes:", len(trade_edges))
-print("Pilgrimadge routes:", len(pilgrimadge_edges))
-print()
+# trade_edges = edges[edges['USES'] == 'trd']
+# pilgrimadge_edges = edges[edges['USES'] == 'plg']
+# print("Trade routes:", len(trade_edges))
+# print("Pilgrimadge routes:", len(pilgrimadge_edges))
+# print()
 
-network_trade = nx.Graph()
-network_trade.add_edges_from(zip(trade_edges.NODEID1, trade_edges.NODEID2))
+# network_trade = nx.Graph()
+# network_trade.add_edges_from(zip(trade_edges.NODE1, trade_edges.NODE2))
+#
+# network_pilgrimadge = nx.Graph()
+# network_pilgrimadge.add_edges_from(zip(pilgrimadge_edges.NODE1, pilgrimadge_edges.NODE2))
 
-network_pilgrimadge = nx.Graph()
-network_pilgrimadge.add_edges_from(zip(pilgrimadge_edges.NODEID1, pilgrimadge_edges.NODEID2))
+
+# print("Trade nodes:", len(network_trade.nodes()))
+# print("Pilgrimadge nodes:", len(network_pilgrimadge.nodes()))
 
 
-print("Trade nodes:", len(network_trade.nodes()))
-print("Pilgrimadge nodes:", len(network_pilgrimadge.nodes()))
+# degree_of_node = dict()
+# for node in G:
+#     degree_of_node[node] = len(G[node])
+#
+# print("mean degree:", np.sum(list(degree_of_node.values()))/len(G.nodes()))
+#
+# def degree_pmf_graph(G):
+#     degree_of_G_pmf = dict()
+#     for node in G.nodes():
+#         try:
+#             degree_of_G_pmf[len(G[node])] += 1
+#         except KeyError:
+#             degree_of_G_pmf[len(G[node])] = 1
+#     return Pmf(degree_of_G_pmf)
+#
+# degree_of_G_pmf = degree_pmf_graph(G)
+#
+#
+# thinkplot.Pmf(degree_of_G_pmf)
+# plt.title("Distribution of Degree")
+# plt.xlabel("Degree")
+# plt.ylabel("PMF")
+# thinkplot.show()
+#
+# degree_of_trade_pmf = degree_pmf_graph(network_trade)
+# degree_of_pilgrimadge_pmf = degree_pmf_graph(network_pilgrimadge)
+
+
+
 
 
 def draw_graph(G):
@@ -87,10 +122,13 @@ class CityInfectionModel:
 
 
         # Make np array to hold entire history
-        # 3D: axis0 = city; axis1=s,i,d (susceptible, infected, dead); axis2=time steps
-        self.history = np.zeros((len(self.node_list), 4, max_steps), dtype=np.uint8)
+        # 3D: axis0 = city; axis1=s,i,d,iTimes (susceptible, infected, dead, num times transmission happened); axis2=time steps
+        self.history = np.zeros((len(self.node_list), 4, max_steps+1), dtype=np.uint8)
         # Init susceptible population @ time 0 to 100
-        self.history[:, 0, 0] = 100
+        self.history[:, 0, 0] = 250
+        self.max_steps = max_steps
+
+        self.sum_infection = 0
 
         init_infected = [] if init_infected is None else init_infected
         for city in init_infected:
@@ -146,6 +184,7 @@ class CityInfectionModel:
         # Probability of transmission is the transmission_rate times number of infected in origin city
         # Should this be the infected ratio of origin city?
         p_transmission = self.transmission_rate * self.history[self.cityI(city), self.I, time_step]
+
         for neighbor in G[city]:
             if toss(p_transmission):
                 # print("transmiting from {} to {}".format(city, neighbor))
@@ -155,6 +194,7 @@ class CityInfectionModel:
                 self.city_make_infected(neighbor, time_step, num_to_transmit)
                 self.history[self.cityI(city), self.Itimes, time_step] += 1
                 self.cur_infected.add(neighbor) # Add city to cur_infected so that it gets SIR run on it
+                self.sum_infection += 1
 
     def intercity_one_step(self, time_step):
         """ Runs intercity_step_one_city on all infected cities """
@@ -172,32 +212,31 @@ class CityInfectionModel:
         self.SIR_one_step(time_step)
         self.intercity_one_step(time_step)
 
-    def run_model(self, n, init_time_step = 1):
+    def run_model(self, n = None, init_time_step = 1):
         """ loop through steps and update_city, SIR_step, intercity_step n times starting at init_time_step"""
+        n = self.max_steps if n is None else n
 
         for time_step in range(init_time_step, init_time_step + n):
-            if time_step%10==0: print("step {}".format(time_step))
+            if time_step%10==0: print("step {}, infected {}, sum_infection {}".format(time_step, len(self.cur_infected), self.sum_infection))
             self.model_one_step(time_step)
 
-    def save_to_disk(self, filename):
-        _pickle.dump(self.history, open(filename, "wb"))
+    def save_to_disk(self, filename=None):
+        if filename is None:
+            filename = "run_{}_{}_{}_{}".format(self.infection_rate, self.mortality_rate, self.transmission_rate, self.max_steps)
+        _pickle.dump(self.history, open("{}.pkl".format(filename), "wb"))
+        _pickle.dump(self.node_list, open("{}_nodelist.pkl".format(filename), "wb"))
+        _pickle.dump((self.infection_rate, self.mortality_rate, self.transmission_rate), open("{}_modelrates.pkl".format(filename), "wb"))
+        print("Saved to {}".format(filename))
 
 
-
-init_infected = ["Paris"]
-plague = CityInfectionModel(G.nodes(), 1500, init_infected=init_infected)
+init_infected = [random.choice(["Aksu", "Ch'ang-an", "Lou-lan", "Lo-yang", "Qocho"])]
+plague = CityInfectionModel(G.nodes(), 400, init_infected=init_infected, model_rates=(.1, .05, .03))
 time_step = 0
 
-# Print infection
-# print(plague.history[0,0,0])
-# print(plague.history[plague.history[:,0,0] != 100])
-# print(plague.history[plague.cityI("Paris")])
 
-print()
+plague.run_model()
 
-plague.run_model(1500)
-
-plague.save_to_disk("test_run.pkl")
+plague.save_to_disk()
 
 # print(plague.history[plague.history[:,0,0] != 100])
 # print(plague.history[:,:,50])
