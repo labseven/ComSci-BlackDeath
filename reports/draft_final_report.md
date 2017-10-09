@@ -7,7 +7,7 @@ Gómez and Verdú model the infection patterns of the Black Death pandemic in th
 ## Replication
 Gómez and Verdú construct a historically accurate network representing Europe and Asia using the OWTRAD dataset, which contains information about medieval cities and the trade and pilgrimage routes between them. They start the plague in a city in Asia, representing a city’s infection state as a binary state, and then let the plague propagate through the network with a given transmission chance. As expected, they find that hub cities get reinfected repeatedly. They find that cities with high mortality (as reported in historical accounts) were cities with high centrality on the network. From this, they conclude that reinfection from neighboring cities is a possible mechanism for higher mortality rates.
 
-![Figure 1: network]("media/Geographical network.png")
+![Figure 1: network](media/Geographical network.png)
 
 We replicate this network using the datasets Gómez and Verdú list. Our network is different, particularly with respect to degree centrality and degree. We have 259 extra nodes present in our network, which indicates that our data is different despite using data Gómez and Verdú list in their supplement from the same source.
 
