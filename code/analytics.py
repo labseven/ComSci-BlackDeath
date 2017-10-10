@@ -47,9 +47,11 @@ node_list = _pickle.load(open("{}_nodelist.pkl".format(sys.argv[1]), "rb"))
 # thinkplot.plot(history[1,:3,:100].T)
 # thinkplot.show()
 
-thinkplot.Plot(np.sum(history[:, 0, :], axis=0))
-thinkplot.Plot(np.sum(history[:, 1, :], axis=0))
+thinkplot.Plot(np.sum(history[:, 0, :], axis=0), label="Susceptible")
+thinkplot.Plot(np.sum(history[:, 1, :], axis=0), label="Infected")
+thinkplot.Plot(np.sum(history[:, 2, :], axis=0), label="Dead")
 plt.title("Sum alive in all of Europe")
+thinkplot.config(legend=True)
 thinkplot.show()
 
 

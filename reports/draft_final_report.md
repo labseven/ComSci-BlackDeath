@@ -33,14 +33,17 @@ We run the simulation of infection to identify if a relationship between hub cit
 ![Figure 2: degree_vs_reinfection](media/degree_vs_infections2.png)
 "Figure 2: Reinfections vs Degree Centrality"
 
+Figure 2 shows the relationship between degree centrality and number of reinfections. Reinfections appear to increase proportionally with degree centrality.
 
+Despite the differences between the networks, Figure 2 shows that hub cities get reinfected more often in our model as well.
+
+
+
+![Figure 3: SIR_One_city.png](media/SIR_One_city.png)
+"Figure 3: SIR in one city"
 
 We plot the SIR metrics for one of the cities in the network given an infection rate of 0.1, a mortality rate of 0.1, and a transmission rate of 0.05.
 
-Figure: SIR one city
-
 The number of susceptible residents decreases as infected residents increases, and infection slows down as more people die. The death rate slows when about half of the population dies.
-
-
 
 This indicates the SIR model is working as expected; the population transitions from state to state, and when mortality and infection rates are equal, mortality is limiting transmission.
