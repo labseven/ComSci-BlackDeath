@@ -2,7 +2,7 @@
 Adam Novotny, Apurva Raman
 
 ## Abstract:
-Gómez and Verdú model the infection patterns of the Black Death pandemic in their 2017 paper “Network theory may explain the vulnerability of medieval human settlements to the Black Death pandemic”. They construct a historically accurate network representing Europe and Asia using the OWTRAD dataset, which contains information about medieval cities and the trade and pilgrimage routes between them. They find that hub cities are prone to being reinfected more often. We replicate this experiment and add an SIR model in each city to investigate how mortality affects transmission of the disease through the network. We find TODO: result here (the disease to spreads through the network and total mortality is affected by x, y, z).
+Gómez and Verdú model the infection patterns of the Black Death pandemic in their 2017 paper “Network theory may explain the vulnerability of medieval human settlements to the Black Death pandemic”. They construct a historically accurate network representing Europe and Asia using the [OWTRAD dataset][1], which contains information about medieval cities and the trade and pilgrimage routes between them. They find that hub cities are prone to being reinfected more often. We replicate this experiment and add an SIR model in each city to investigate how mortality affects transmission of the disease through the network. We find TODO: result here (the disease to spreads through the network and total mortality is affected by x, y, z).
 
 ## Replication
 Gómez and Verdú construct a historically accurate network representing Europe and Asia using the OWTRAD dataset, which contains information about medieval cities and the trade and pilgrimage routes between them. They start the plague in a city in Asia, representing a city’s infection state as a binary state, and then let the plague propagate through the network with a given transmission chance. In their network, hub cities get reinfected repeatedly. They find that cities with high mortality (as reported in historical accounts) were cities with high centrality on the network. From this, they conclude that reinfection from neighboring cities is a possible mechanism for higher mortality rates.
@@ -54,3 +54,7 @@ This indicates the SIR model is working as expected; the population transitions 
 Figure 4 shows the distribution of the number of reinfections. there is a steep jump around 1500, which is something we are investigating.
 
 Our next step is to sweep the three parameters, and analyze the data we extract from that.
+
+
+## References
+[1]: http://ciolek.com/OWTRAD/DATA/oddda.html  "OWTRAD Dataset"
