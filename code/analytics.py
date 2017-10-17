@@ -42,8 +42,9 @@ node_list = _pickle.load(open("{}_nodelist.pkl".format(sys.argv[1]), "rb"))
 # print(len(history[history[:,0,50] > 50, :, 50]))
 # print(len(history[history[:,0,50] < 50, :, 50]))
 
-
-thinkplot.plot(history[0,4,:])
+city_i = 5
+thinkplot.plot(history[city_i,4,:])
+plt.title("Infected at each timestep, degree" + str(len(G[node_list[city_i]])))
 thinkplot.show()
 
 # thinkplot.plot(history[1,:3,:100].T)
