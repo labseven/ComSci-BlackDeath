@@ -5,7 +5,7 @@ Adam Novotny, Apurva Raman
 Gómez and Verdú model the infection patterns of the Black Death pandemic in their 2017 paper “Network theory may explain the vulnerability of medieval human settlements to the Black Death pandemic”. They construct a historically accurate network representing Europe and part of Asia and Africa using the [OWTRAD (Old World Trade Routes) dataset][1], which contains information about medieval cities and the trade and pilgrimage routes between them. They find that hub cities are prone to being reinfected more often. We replicate this experiment and add an SIR model in each city to investigate how mortality affects transmission of the disease through the network. We find TODO: result here (the disease to spreads through the network and total mortality is affected by x, y, z).
 
 ## Replication
-Gómez and Verdú construct a historically accurate network representing Europe and part of Asia and Africa using the OWTRAD (Old World Trade Routes) dataset, which contains information about medieval cities and the trade and pilgrimage routes between them. They start the plague in a city in Asia, representing a city’s infection state as a binary state, and then let the plague propagate through the network with a given transmission chance. In their network, hub cities get reinfected repeatedly. They find that cities with high mortality (as reported in historical accounts) were cities with high centrality on the network. From this, they conclude that reinfection from neighboring cities is a possible mechanism for higher mortality rates.
+Gómez and Verdú construct a historically accurate network representing Europe and part of Asia and Africa using the OWTRAD (Old World Trade Routes) dataset, which contains information about medieval cities and the trade and pilgrimage routes between them. They start the plague in a city in Asia, representing a city’s infection state as a binary state, and then let the plague propagate through the network with a given transmission chance. In their model, hub cities get reinfected repeatedly. They find that cities with high mortality (as reported in historical accounts) were cities with high centrality on the network. From this, they conclude that reinfection from neighboring cities is a possible mechanism for higher mortality rates.
 
 ![Figure 1: network](media/Geographical_network.png)
 Figure 1: A geographical representation of the network. Created by Gómez and Verdú.
@@ -45,9 +45,9 @@ Degree centrality is directly proportional to degree, and is one of the methods 
 
 
 ![Figure 3: SIR_One_city.png](media/SIR_One_city.png)
-Figure 3: SIR in one city
+Figure 3: SIR in Europe
 
-We plot the SIR metrics for one of the cities in the network given an infection rate of 0.1, a mortality rate of 0.1, and a transmission rate of 0.05.
+We plot the sum of the SIR metrics in the network given an infection rate of 0.1, a mortality rate of 0.1, and a transmission rate of 0.05.
 
 The number of susceptible residents decreases as infected residents increases, and infection slows down as more people die. The death rate slows when about half of the population dies.
 
