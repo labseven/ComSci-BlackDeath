@@ -252,10 +252,10 @@ class CityInfectionModel:
 
 # i,m,t,r = (.1, .05, .1, .1)
 
-infection_rates    = np.logspace(-2,0,num=20) # Logspace values between .01 and 1
-mortality_rates    = np.logspace(-2,0,num=20)
-transmission_rates = np.logspace(-2,0,num=20)
-r_rates            = np.logspace(-2,0,num=20)
+infection_rates    = np.logspace(-2,-.1,num=5) # Logspace values between .01 and 1
+mortality_rates    = np.logspace(-2,-.1,num=5)
+transmission_rates = np.logspace(-2.5,-.1,num=6)
+r_rates            = np.logspace(-2,-.1,num=5)
 
 
 for i in infection_rates:
