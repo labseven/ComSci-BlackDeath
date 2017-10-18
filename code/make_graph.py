@@ -250,22 +250,27 @@ class CityInfectionModel:
         _pickle.dump((self.infection_rate, self.mortality_rate, self.transmission_rate, self.r_rate), open("{}_modelrates.pkl".format(filename), "wb"))
         print("Saved to {}".format(filename))
 
-# i,m,t,r = (.1, .05, .1, .1)
+i,m,t,r = (.01, .15, .03, .01)
 
-infection_rates    = np.logspace(-2,-.1,num=5) # Logspace values between .01 and 1
-mortality_rates    = np.logspace(-2,-.1,num=5)
-transmission_rates = np.logspace(-2.5,-.1,num=6)
-r_rates            = np.logspace(-2,-.1,num=5)
+init_infected = [random.choice(["Aksu", "Ch'ang-an", "Lou-lan", "Lo-yang", "Qocho"])]
+plague = CityInfectionModel(G.nodes(), 700, init_infected=init_infected, model_rates=(i, m, t, r))
+plague.run_model()
+plague.save_to_disk()
+
+# infection_rates    = np.logspace(-2,-.1,num=5) # Logspace values between .01 and 1
+# mortality_rates    = np.logspace(-2,-.1,num=5)
+# transmission_rates = np.logspace(-2.5,-.1,num=6)
+# r_rates            = np.logspace(-2,-.1,num=5)
 
 
-for i in infection_rates:
-    for m in mortality_rates:
-        for t in transmission_rates:
-            for r in r_rates:
-                init_infected = [random.choice(["Aksu", "Ch'ang-an", "Lou-lan", "Lo-yang", "Qocho"])]
-                plague = CityInfectionModel(G.nodes(), 500, init_infected=init_infected, model_rates=(i, m, t, r))
-                plague.run_model()
-                plague.save_to_disk()
+# for i in infection_rates:
+#     for m in mortality_rates:
+#         for t in transmission_rates:
+#             for r in r_rates:
+                # init_infected = [random.choice(["Aksu", "Ch'ang-an", "Lou-lan", "Lo-yang", "Qocho"])]
+                # plague = CityInfectionModel(G.nodes(), 500, init_infected=init_infected, model_rates=(i, m, t, r))
+                # plague.run_model()
+                # plague.save_to_disk()
 
 
 

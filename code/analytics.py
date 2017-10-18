@@ -42,6 +42,53 @@ node_list = _pickle.load(open("{}_nodelist.pkl".format(sys.argv[1]), "rb"))
 # print(len(history[history[:,0,50] > 50, :, 50]))
 # print(len(history[history[:,0,50] < 50, :, 50]))
 
+
+
+""" Plot infections vs degree and closeness """
+def node_index(city):
+    return node_list.index(city)
+
+infections_per_city = dict()
+for city in node_list:
+    infections_per_city[city] = np.sum(history[node_index(city), 4, :])
+
+
+degree_vs_infections = np.zeros((len(node_list), 2))
+degree_centrality = nx.degree_centrality(G)
+for i, city in enumerate(node_list):
+    degree_vs_infections[i] = (len(G[city]), infections_per_city[city])
+
+degree_vs_death = np.zeros((len(node_list), 2))
+for i, city in enumerate(node_list):
+    degree_vs_death[i] = (len(G[city]), (1- history[node_index(city), 3, -1]/250) * 100)
+
+thinkplot.Scatter(degree_vs_death[:, 0], degree_vs_death[:, 1])
+plt.title("Degree vs Mortality")
+plt.xlabel("Degree t")
+plt.ylabel("Mortality %")
+# plt.yscale('log')
+thinkplot.show()
+
+thinkplot.Scatter(degree_vs_infections[:, 0], degree_vs_infections[:, 1])
+plt.title("Degree vs Reinfections")
+plt.xlabel("Degree t")
+plt.ylabel("Reinfections")
+thinkplot.show()
+
+
+
+
+thinkplot.plot(np.sum(history[:,4,:], axis = 0))
+plt.title("Infections across t")
+thinkplot.show()
+
+thinkplot.Cdf(Cdf(history[:,0,-2]), label="S")
+thinkplot.Cdf(Cdf(history[:,1,-2]), label="I")
+thinkplot.Cdf(Cdf(history[:,2,-2]), label="Dead")
+thinkplot.Cdf(Cdf(history[:,3,-2]), label="R")
+plt.title("D in each city")
+thinkplot.show()
+
 city_i = 5
 thinkplot.plot(history[city_i,4,:])
 plt.title("Infected at each timestep, degree" + str(len(G[node_list[city_i]])))
@@ -50,10 +97,10 @@ thinkplot.show()
 # thinkplot.plot(history[1,:3,:100].T)
 # thinkplot.show()
 
+thinkplot.Plot(np.sum(history[:, 3, :], axis=0), label="NYS")
 thinkplot.Plot(np.sum(history[:, 0, :], axis=0), label="Susceptible")
 thinkplot.Plot(np.sum(history[:, 1, :], axis=0), label="Infected")
 thinkplot.Plot(np.sum(history[:, 2, :], axis=0), label="Dead")
-thinkplot.Plot(np.sum(history[:, 3, :], axis=0), label="R")
 plt.title("Population distribution in entire simulation")
 plt.xlabel("Timestep")
 plt.ylabel("Population")
@@ -97,26 +144,6 @@ thinkplot.show()
 # print("G Clustering:", nx.average_clustering(G))
 
 
-
-""" Plot infections vs degree and closeness """
-def node_index(city):
-    return node_list.index(city)
-
-infections_per_city = dict()
-for city in node_list:
-    infections_per_city[city] = np.sum(history[node_index(city), 4, :])
-
-
-degree_vs_infections = np.zeros((len(node_list), 2))
-degree_centrality = nx.degree_centrality(G)
-for i, city in enumerate(node_list):
-    degree_vs_infections[i] = (degree_centrality[city], infections_per_city[city])
-
-thinkplot.Scatter(degree_vs_infections[:, 0], degree_vs_infections[:, 1])
-plt.title("Degree vs Reinfections")
-plt.xlabel("Degree Centrality")
-plt.ylabel("Reinfections")
-thinkplot.show()
 
 
 
