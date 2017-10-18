@@ -28,11 +28,23 @@ Their model simulates transmission between each city, but does not simulate a ci
 
 To determine whether hubs still get reinfected more frequently when we add mortality to the simulation, we extend the model to simulate mortality by adding an SIR model to each city.
 
-An SIR model is an epidemiological model for determining the number of people infected with a disease in a well mixed population. It has three states. The first is the susceptible state, which represents the number of people who are not infected, but could become infected. At each timestep, susceptible people have a probability of transitioning to the infected state, which is determined by the amount of infected people in the population and the rate of infection. In a traditional SIR model, infected people have a probability of recovering (the third state) at each timestep, but we use this third state to track the number of dead from the disease, which uses the mortality rate instead of the recovery rate.
+An SIR model is an epidemiological model for determining the number of people infected with a disease in a well mixed population. It has three states. The first is the susceptible state, which represents the number of people who are not infected, but could become infected. At each timestep, susceptible people have a probability of transitioning to the infected state, which is determined by the amount of infected people in the population and the rate of infection. In a traditional SIR model, infected people have a probability of recovering and becoming immune (the third state) at each timestep, but we use this third state to track the number of dead from the disease, which uses the mortality rate instead of the recovery rate.
 
-We give each city a population of 250 at the start of the simulation. At each timestep, the tally of susceptible, infected, and dead residents is updated based on their respective probabilities and the number of infected people.
+We added a state, "not yet susceptible" before susceptible. A percentage of the population in NYS gets moved to S every time a city gets infected from a neighbor. This model prevents a single infection from wiping out the entire city, This reflects historical accounts of an epidemic, ... {new strains and resistance to old strains}.
 
-A city with infected residents may also transmit the disease to another city with a probability determined by transmission rate and the number of infected citizens. Cities can transmit disease to cities that are already infected, which are the reinfection events Gómez and Verdú track.
+We give each city a population of 250 at the start of the simulation. At each timestep, the tally of NYS, susceptible, infected, and dead residents is updated based on their respective probabilities and the number of infected people and the number of infections in each timestep.
+
+```
+Code block of the 4 diff eq's
+```
+
+A city with infected residents may also transmit the disease to another city with a probability determined by transmission rate and the number of infected citizens.
+
+```
+Diff eq
+```
+
+Cities can transmit disease to cities that are already infected, which are the reinfection events that Gómez and Verdú track.
 
 We run the simulation of infection to identify if a relationship between hub cities and amount of reinfection is present.
 
