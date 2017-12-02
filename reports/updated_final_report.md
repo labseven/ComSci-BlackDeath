@@ -40,7 +40,7 @@ First, we had trouble replicating the GV network. In the supplement, they list e
 | Mean Degree Pilgrimage| 0.59 |  0.69
 | Transitivity | 0.065 | 0.098 |
 
-The other issue we had was knowing what "Relationship between the network attributes of the cities and the probability of multiple infections" means. The source code for GV simulation is in the "supplementary information," but the analysis code is not attached, and therefore we could not recreate their graphs.
+The other issue we had was figuring out what "Relationship between the network attributes of the cities and the probability of multiple infections" means. The source code for GV simulation is in the "supplementary information," but the analysis code is not attached, and therefore we could not recreate their graphs.
 
 We replicate their model, and also find a relationship between degree centrality and reinfection rates. We cannot compare the results quantitatively because the GV paper does not include these data.
 
@@ -49,11 +49,11 @@ The GV model only represents a city's infection state as a binary, but then comp
 
 We add an SIR model in each city to analyze the effects of mortality on the transmission of the plague directly.
 
-An SIR model is an epidemiological model for determining the number of people infected with a disease in a well mixed population. It has three states; Susceptible, Infected, Recovered. The susceptible population is not yet infected, but can become infected. At each timestep, susceptible people have a probability of transitioning to the infected state, which is determined by the fraction of infected in the population and the rate of infection. The third state in our model (Recovered) represents people who are dead, and do not infect the susceptible population anymore.
+An SIR model is an epidemiological model for determining the number of people infected with a disease in a well mixed population. It has three states; Susceptible, Infected, Recovered. The susceptible population is not yet infected, but can become infected. At each timestep, susceptible people have a probability of transitioning to the infected state, which is determined by the fraction of infected in the population and the rate of infection. The third state in our model (Recovered) represents people who are dead, and cannot infect the susceptible population anymore.
 
-In a traditional SIR model, a single infection will eventually spread through and kill the entire population. In the real world, people in a city are not as well mixed, and outbreaks happen locally. There are many ways to model this behavior, for example by building a network of people within the city. We chose to add a state, "Not Yet Susceptible" (NYS), that a population can be in.
+In a traditional SIR model, a single infection will eventually spread through and kill the entire population. In the real world people in a city are not as well mixed, so outbreaks happen locally. There are many ways to model this behavior, for example by building a network of people within the city. We chose to add a state to the SIR model, "Not Yet Susceptible" (NYS), that a population can be in.
 
-A city starts with the entire population in NYS, and a percentage of the population gets moved to S every time an city gets infected from a neighbor. This way, if a city gets infected only once, the single wave will only be able to kill a portion of the population.
+A city starts with the entire population in NYS, and a percentage of the population gets moved to S every time an city gets infected from a neighbor. This way, if a city gets infected once, the single outbreak will only be able to kill a portion of the population.
 
 ![SIR diagram](media/sir_diagram.png)
 
@@ -86,29 +86,25 @@ To validate that our model can accurately simulate disease spread though the net
 
 The number of not yet susceptible people drops rapidly as cities in the simulation get reinfected and the number of susceptible and infected people increases. As people start to die more frequently, the number of not yet susceptible people stabilizes since infection is slowing due to mortality.
 
-This indicates that our modified SIR model is working as expected; the population transitions from state to state, and when mortality and infection rates are equal, mortality is limiting transmission. It also demonstrates that the entire population is not getting wiped out.
+This indicates that our modified SIR model is working as expected; the population transitions from state to state, and when mortality and infection rates are equal, mortality limits transmission. It also demonstrates that the entire population is not getting wiped out.
 
 ## Results
+GV study the relationship between centrality and reinfections. Figure {}, shows the relationship between degree and number of reinfections. Reinfections increase proportionally with degree. This further confirms GV's conclusions that central cities were infected more often. Next, we analyze how changing disease parameters affects the outcomes.
 
 ![Figure 4: Reinfections vs Degree](media/reinfections_vs_degree.png)
 
 Figure 4: Reinfections vs Degree
 
-Figure {}, shows the relationship between degree and number of reinfections. Reinfections increase proportionally with degree.
-
-Degree centrality is one of the network attributes GV use in their analysis. Figure {} shows that in our model, central cities also get reinfected more often. Next, we analyze how changing disease parameters affects the simulation.
-
-
 ![4 Plots](media/4_plots.png)
 
 Figure 7: how modifying Mortality rate and Transmission rate affect reinfections vs degree
 
-In Figure {} we plot degree vs. reinfections with different parameters for mortality and transmission rates. All graphs show a linear relationship between degree and number of reinfections. This shows that our interpretation is robust, i.e., it holds true for a wide range of input parameters.
+In Figure {} we plot degree vs. reinfections with different parameters for mortality and transmission rates. All graphs show a linear relationship between degree and number of reinfections. This shows that our conclusion is robust, i.e., it holds true for a wide range of input parameters.
 
-Interestingly, when the mortality rate is high (top left), the relationship is less clear. In this case, the infected population dies in a few time steps, so their exposure to susceptible people and other cities is short. The effect is very similar to a low transmission rate between cities (bottom right).
+Interestingly, when the mortality rate is high (top left), the relationship is less clear. In this case, the infected population dies in a few time steps, so their exposure to susceptible people and other cities is short. The effect is very similar to setting the transmission rate between cities low (bottom right).
 
 
-## Results
+## Interpretation
 Ultimately, our extension added nothing substantial to the GV model other than making it much more complicated. The GV model shows that central cities are infected more often, and our model has the same property. We are able to show that our results are robust to a wide range of parameters, so at least our model is not overfitting. The extra complexity does generate much more data, but we do not have the analytical skills to discover any original results from it.
 
 ## References
