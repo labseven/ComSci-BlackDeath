@@ -86,7 +86,7 @@ This indicates that our modified SIR model is working as expected; the populatio
 
 ## Results
 
-![Figure 4: Reinfections vs Degree](media/reinfections_vs_degree_small.png)
+![Figure 4: Reinfections vs Degree](media/reinfections_vs_degree.png)
 
 Figure 4: Reinfections vs Degree
 
