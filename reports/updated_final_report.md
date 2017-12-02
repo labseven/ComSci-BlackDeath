@@ -11,15 +11,19 @@ They represent a city's infection state as a binary. At each step, an infected c
 
 They plot historical mortality rates against centrality (degree, closeness, and clustering coefficient) to show that cities with high centrality tend to have higher mortality rates.
 
+
+![Figure 1: network](media/Geographical_network.png)
+
+Figure 1: A geographical representation of the network. Created by Gómez and Verdú.
+
+
 Then they plot the "Relationship between the network attributes of the cities and the probability of multiple infections" against the transmission probability. After multiple readings, I still have not figured out what these numbers (and their scale) even mean. All they show is that the advantage of being isolated is lowered when transmission is high. This makes intuitive sense, because as the p_t approaches 1 each city gets infected by its neighbors every step.
 
 Finally, they propose that a possible reason that cities with high centrality have (historically) high mortality is that they had more chances of being reinfected. They speculate that “[t]he overall mortality rate will be the cumulative outcome of partial mortalities caused by each infection wave … [and] a city invaded multiple times could receive different pathogen strains.”
 
-Ultimately, the simulation in the GV paper is pretty garbage. The only useful thing they do is aggregate historical mortality data and compare it to historical network attributes. Their simulation just adds complexity to an otherwise sound conclusion. They suggest that properties of their simulation explain a "potential mechanism" of the historical results, without any data connecting the two.
+Ultimately, the simulation in the GV paper is quite simple. The only useful thing they do is aggregate historical mortality data and compare it to historical network attributes. Their simulation just adds complexity to an otherwise sound conclusion. The network is enough to show that the cities with high centrality have high mortality.
 
-Had I been clear-headed when choosing a paper to replicate, I would have realized how trash it was for a complexity project, and would have had decided on something better.
-
-Halfway through, I realized that we were adding features onto a steaming pile of crap, but was too far in and chose denial.
+Had I been clear-headed when choosing a paper to replicate, I would have realized how unsuitable this paper was for a complexity science project, and would have had decided on something better.
 
 ## Replication:
 We ran into a few problems when attempting to replicate the research paper.
@@ -69,7 +73,7 @@ Probability of transmission = T_rate * I
 
 Cities can transmit disease to cities that are already infected, which converts people from NYS to S, and makes one more person in the city infected.
 
-This SIR model acts as expected, keeping a percentage of the city alive until new infections make them susceptible. This reflects current knowledge of the epidemic by simulating infections spreading in different parts of the city, or multiple strains that infect different parts of the population [2][3].
+This SIR model keeps a percentage of the city alive until new infections make them susceptible. This reflects current knowledge of the epidemic by simulating infections spreading in different parts of the city, or multiple strains that infect different parts of the population [2][3].
 
 
 ## Validation:
