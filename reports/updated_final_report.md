@@ -78,7 +78,7 @@ This SIR model keeps a percentage of the city alive until new infections make th
 
 ## Validation:
 
-![Figure 2: Simulation’s population](media/Network_population.png)
+![Figure 2: Simulation’s population](media/Network_population2.png)
 
 Figure 2: Population in each state in the entire network
 
