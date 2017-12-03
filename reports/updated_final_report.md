@@ -2,12 +2,14 @@
 Adam Novotny, Apurva Raman
 
 ## Abstract:
-Gómez and Verdú (GV) model the infection patterns of the Black Death pandemic [4]. They create a network of medieval cities and routes from the [OWTRAD (Old World Trade Routes) dataset][1], and model the transmission of the disease. They find that hub cities (those with high degree centrality) are infected more often, and compare their model's output to historical mortality data.
+Gómez and Verdú (GV) model the infection patterns of the Black Death pandemic [4]. They create a network of medieval cities and routes from the [Old World Trade Routes (OWTRAD) dataset][1], and simulate the transmission of the disease. They find that hub cities (those with high degree centrality) are infected more often, and compare their model's output to historical mortality data.
+
+We add an SIR model in each city to analyze the effects of mortality on the propagation of the disease.
 
 
 ## Analysis of GV Paper:
 Gómez and Verdú create a network of medieval cities and connect them with trade and pilgrimage routes using historical data from the OWTRAD dataset.
-They represent a city's infection state as a binary. At each step, an infected city has a probability of infecting each neighbor. Once a city has been infected it stays infected forever. A city may be infected multiple times, and GV tally the number of times each city gets infected. They start the model with a random city in Central Asia infected, and run it until a constant number of infection events have happened (6x the number of cities [this seems to be arbitrarily chosen to ensure multiple infections]).
+They represent a city's infection state as a binary. For each timestep, an infected city has a probability of infecting each neighbor. Once a city has been infected it stays infected forever. A city may be infected multiple times, and Gómez and Verdú tally the number of times each city gets infected. They start the model with a random city in Central Asia infected, and run it until a constant number of infection events have happened (6x the number of cities [this seems to be arbitrarily chosen to ensure multiple infections]).
 
 ![Figure 1: network](media/Geographical_network.png)
 
@@ -15,11 +17,9 @@ Figure 1: A geographical representation of the network. Created by Gómez and Ve
 
 They plot historical mortality rates against centrality (degree, closeness, and clustering coefficient) to show that cities with high centrality tend to have higher mortality rates. Then, they show [4.1] that in their simulation, cities with high centrality were infected more often.
 
-Finally, they propose that a possible reason that cities with high centrality had higher mortality is that they got infected more often. They speculate that “[t]he overall mortality rate will be the cumulative outcome of partial mortalities caused by each infection wave … [and] a city invaded multiple times could receive different pathogen strains.”
+Finally, they propose that a possible reason that central cities had higher mortality is that they got reinfected more often. They speculate that “[t]he overall mortality rate will be the cumulative outcome of partial mortalities caused by each infection wave … [and] a city invaded multiple times could receive different pathogen strains.”
 
-Ultimately, the simulation in the GV paper is quite simple. The only useful thing they do is aggregate historical mortality data and compare it to historical network attributes. Their simulation just adds complexity to an otherwise sound conclusion.
-
-Had I been clear-headed when choosing a paper to replicate, I would have realized how unsuitable this paper was for a complexity science project, and would have had decided on a different one.
+Ultimately, the simulation in the GV paper is quite simple. The only useful thing they do is aggregate historical mortality data and compare it to historical network attributes. Their simulation just adds complexity to an otherwise sound conclusion. Had I been clear-headed when choosing a paper to replicate, I would have realized how unsuitable this paper was for a complexity science project, and would have had decided on a different one.
 
 ## Replication:
 We ran into a few problems when attempting to replicate the research paper.
@@ -76,7 +76,7 @@ This SIR model keeps a percentage of the city alive until new infections make th
 
 Figure 2: Population in each state in the entire network
 
-To validate that our model can accurately simulate disease spread though the network, we ran the model with a sweep of parameters and analyzed the results. Figure 2 shows global population state for one set of parameters (chosen to make a representative graph).
+To validate that our model can accurately simulate disease spread though the network, we ran the model with a sweep of parameters and analyzed the results. Figure 2 shows global population state for one set of parameters (chosen to make a representative graph). Different parameters make a qualitatively similar graph, with different slopes.s
 
 The number of not yet susceptible people drops rapidly as cities in the simulation get infected and the number of susceptible and infected people increases. As people start to die, and with less people to infect, the number of not yet susceptible people stabilizes.
 
